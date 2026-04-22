@@ -1,0 +1,69 @@
+services:
+  products-db:
+    image: postgres:16-alpine
+    container_name: products-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: products_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - products_db_data:/var/lib/postgresql/data
+      - ./sql/products.sql:/docker-entrypoint-initdb.d/01-products.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  orders-db:
+    image: postgres:16-alpine
+    container_name: orders-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: orders_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - orders_db_data:/var/lib/postgresql/data
+      - ./sql/orders.sql:/docker-entrypoint-initdb.d/01-orders.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  products-service:
+    build:
+      context: .
+      dockerfile: products_service/Dockerfile
+    container_name: products-service
+    environment:
+      PRODUCTS_DATABASE_URL: postgresql+psycopg2://postgres:postgres@products-db:5432/products_db
+    ports:
+      - "8001:8001"
+    depends_on:
+      products-db:
+        condition: service_healthy
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: orders_service/Dockerfile
+    container_name: orders-service
+    environment:
+      ORDERS_DATABASE_URL: postgresql+psycopg2://postgres:postgres@orders-db:5432/orders_db
+      PRODUCTS_SERVICE_URL: http://products-service:8001
+    ports:
+      - "8002:8002"
+    depends_on:
+      orders-db:
+        condition: service_healthy
+      products-service:
+        condition: service_started
+
+volumes:
+  products_db_data:
+  orders_db_data:
