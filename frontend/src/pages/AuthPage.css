@@ -1,0 +1,129 @@
+.auth-page {
+  width: 100%;
+  min-width: 0;
+  max-width: 22rem;
+  margin: 0 auto;
+  padding: 0.5rem 0 2rem;
+  box-sizing: border-box;
+}
+
+.auth-page__back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.auth-page__back:hover {
+  text-decoration: underline;
+}
+
+.auth-page__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.auth-page__card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.auth-page__card-title {
+  margin: 0 0 1.15rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.auth-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.auth-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.auth-page__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.auth-page__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-page__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.auth-page__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.auth-page__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.auth-page__submit {
+  margin-top: 0.35rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.auth-page__submit:hover {
+  background: var(--color-primary-hover);
+}
+
+.auth-page__switch {
+  margin: 1.15rem 0 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.auth-page__link {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.auth-page__link:hover {
+  text-decoration: underline;
+}

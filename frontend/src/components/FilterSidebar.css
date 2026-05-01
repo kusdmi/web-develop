@@ -1,15 +1,89 @@
 .filter-sidebar {
-  background: #e8e8e8;
-  border: 1px solid #333;
-  padding: 1rem;
-  align-self: start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.125rem;
+  box-shadow: var(--shadow-sm);
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .filter-sidebar {
+    align-self: start;
+  }
+}
+
+.filter-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .filter-sidebar__title {
-  margin: 0 0 1rem;
-  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  border: none;
+}
+
+.filter-sidebar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  font: inherit;
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: #111;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.filter-sidebar__toggle:hover {
+  background: var(--color-primary-soft);
+  border-color: rgba(15, 118, 110, 0.35);
+}
+
+.filter-sidebar__toggle-chevron {
+  display: inline-block;
+  font-size: 0.65rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.filter-sidebar__toggle--open .filter-sidebar__toggle-chevron {
+  transform: rotate(-180deg);
+}
+
+.filter-sidebar__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.filter-sidebar__panel--collapsed {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .filter-sidebar__header {
+    justify-content: flex-start;
+  }
 }
 
 .filter-sidebar__block {
@@ -19,17 +93,56 @@
 }
 
 .filter-sidebar__label {
-  font-size: 0.875rem;
-  color: #111;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
 }
 
 .filter-sidebar__output {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #111;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
 .filter-sidebar input[type='range'] {
   width: 100%;
   max-width: 100%;
+  height: 0.35rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.filter-sidebar__block--group {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.filter-sidebar__group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+.filter-sidebar__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.filter-sidebar__check input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.filter-sidebar__check:has(input[type='checkbox']:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  border-radius: 4px;
 }

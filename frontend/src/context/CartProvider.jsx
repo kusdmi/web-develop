@@ -1,8 +1,59 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { getProductById } from '../data/mockProducts'
+import { QTY_MAX } from '../hooks/useProductCartQty'
 import { CartContext } from './cartContextBase'
 
+const CART_STORAGE_KEY = 'shop-demo-cart'
+
+function readStoredCart() {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(CART_STORAGE_KEY)
+    if (!raw) return []
+    const data = JSON.parse(raw)
+    if (!Array.isArray(data)) return []
+    const lines = []
+    for (const row of data) {
+      if (
+        !row ||
+        typeof row.productId !== 'string' ||
+        typeof row.quantity !== 'number'
+      ) {
+        continue
+      }
+      const product = getProductById(row.productId)
+      if (!product) continue
+      const quantity = Math.min(
+        Math.max(0, Math.floor(row.quantity)),
+        QTY_MAX,
+      )
+      if (quantity > 0) lines.push({ product, quantity })
+    }
+    return lines
+  } catch {
+    return []
+  }
+}
+
+function writeStoredCart(lines) {
+  if (typeof window === 'undefined') return
+  try {
+    const payload = lines.map(({ product, quantity }) => ({
+      productId: product.id,
+      quantity,
+    }))
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(payload))
+  } catch {
+    // нет места / приватный режим
+  }
+}
+
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState(readStoredCart)
+
+  useEffect(() => {
+    writeStoredCart(items)
+  }, [items])
 
   const addToCart = useCallback((product, quantity = 1) => {
     setItems((prev) => {

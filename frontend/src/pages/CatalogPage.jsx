@@ -1,6 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { MOCK_PRODUCTS, CATEGORIES } from '../data/mockProducts'
+import {
+  MOCK_PRODUCTS,
+  CATEGORIES,
+  getCatalogFilterOptions,
+} from '../data/mockProducts'
 import { ShopHeader } from '../components/ShopHeader'
 import { Footer } from '../components/Footer'
 import { Slider } from '../components/Slider'
@@ -9,6 +13,7 @@ import { ProductCard } from '../components/ProductCard'
 import './CatalogPage.css'
 
 const priceCap = Math.max(...MOCK_PRODUCTS.map((p) => p.price), 10000)
+const catalogFilterOptions = getCatalogFilterOptions()
 
 export function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -16,6 +21,10 @@ export function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState(appliedQuery)
   const [categoryFilter, setCategoryFilter] = useState('')
   const [maxPrice, setMaxPrice] = useState(priceCap)
+  const [socketFilter, setSocketFilter] = useState([])
+  const [powerFilter, setPowerFilter] = useState([])
+  const [brandFilter, setBrandFilter] = useState([])
+  const [shapeFilter, setShapeFilter] = useState([])
 
   const runSearch = () => {
     const q = searchQuery.trim()
@@ -31,13 +40,33 @@ export function CatalogPage() {
     return MOCK_PRODUCTS.filter((p) => {
       const catOk = !categoryFilter || p.category === categoryFilter
       const priceOk = p.price <= maxPrice
+      const socketOk = socketFilter.length === 0 || socketFilter.includes(p.socket)
+      const powerOk = powerFilter.length === 0 || powerFilter.includes(p.powerW)
+      const brandOk = brandFilter.length === 0 || brandFilter.includes(p.brand)
+      const shapeOk = shapeFilter.length === 0 || shapeFilter.includes(p.shape)
       const textOk =
         !q ||
         p.name.toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q)
-      return catOk && priceOk && textOk
+      return (
+        catOk &&
+        priceOk &&
+        socketOk &&
+        powerOk &&
+        brandOk &&
+        shapeOk &&
+        textOk
+      )
     })
-  }, [appliedQuery, categoryFilter, maxPrice])
+  }, [
+    appliedQuery,
+    categoryFilter,
+    maxPrice,
+    socketFilter,
+    powerFilter,
+    brandFilter,
+    shapeFilter,
+  ])
 
   return (
     <div className="catalog-page">
@@ -55,6 +84,15 @@ export function CatalogPage() {
           maxPrice={maxPrice}
           onMaxPriceChange={setMaxPrice}
           priceCap={priceCap}
+          socketFilter={socketFilter}
+          onSocketFilterChange={setSocketFilter}
+          powerFilter={powerFilter}
+          onPowerFilterChange={setPowerFilter}
+          brandFilter={brandFilter}
+          onBrandFilterChange={setBrandFilter}
+          shapeFilter={shapeFilter}
+          onShapeFilterChange={setShapeFilter}
+          filterOptions={catalogFilterOptions}
         />
         <div className="catalog-page__grid-wrap">
           <ul className="catalog-page__grid">

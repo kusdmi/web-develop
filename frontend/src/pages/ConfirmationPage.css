@@ -1,6 +1,8 @@
 .confirmation-page {
   min-height: 100%;
-  padding: 1rem 0.75rem 2rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0 2rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -8,47 +10,80 @@
 }
 
 .confirmation-page__title {
-  margin: 0 0 1.25rem;
-  font-size: 1.75rem;
+  margin: 0 0 1.35rem;
+  font-size: clamp(1.5rem, 5vw, 1.85rem);
   font-weight: 700;
-  color: #111;
+  color: var(--color-text);
   text-align: center;
 }
 
 .confirmation-page__box {
   width: 100%;
-  max-width: 24rem;
-  border: 1px solid #333;
-  background: #f0f0f0;
-  padding: 2rem 1.25rem;
+  max-width: 26rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.confirmation-page__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.confirmation-page__icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .confirmation-page__msg,
 .confirmation-page__order {
   margin: 0;
   font-size: 1rem;
-  color: #111;
-  line-height: 1.45;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.confirmation-page__order {
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.confirmation-page__order span {
+  color: var(--color-primary);
 }
 
 .confirmation-page__home {
   display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  border: 1px solid #333;
-  background: #e0e0e0;
-  color: #111;
+  margin-top: 0.35rem;
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
   text-decoration: none;
   font-size: 0.9375rem;
   font-weight: 600;
+  transition: background 0.15s ease;
 }
 
-.confirmation-page__home:hover,
-.confirmation-page__home:focus-visible {
-  background: #d0d0d0;
+.confirmation-page__home:hover {
+  background: var(--color-primary-hover);
 }

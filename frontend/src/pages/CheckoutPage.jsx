@@ -1,17 +1,46 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/useCart'
 import './CheckoutPage.css'
 
-function randomOrderId() {
-  return String(Math.floor(10000 + Math.random() * 90000))
+/** Только цифры, длина 8 — показывается на странице и уходит на подтверждение */
+function generateNumericOrderId() {
+  let s = ''
+  for (let i = 0; i < 8; i += 1) {
+    s += Math.floor(Math.random() * 10).toString()
+  }
+  return s
+}
+
+/** Нормализация к виду 7 + 10 цифр (без плюса) или null */
+function normalizeRuPhoneDigits(raw) {
+  const d = String(raw).replace(/\D/g, '')
+  if (d.length === 11) {
+    if (d[0] === '8') return `7${d.slice(1)}`
+    if (d[0] === '7') return d
+    return null
+  }
+  if (d.length === 10) return `7${d}`
+  return null
+}
+
+/**
+ * Российский номер: после нормализации 11 цифр, код страны 7,
+ * первая цифра национального номера — 3, 4, 8 или 9 (гео, моб., 8xx).
+ */
+function isValidRuPhone(raw) {
+  const n = normalizeRuPhoneDigits(raw)
+  if (!n || n.length !== 11 || n[0] !== '7') return false
+  return /^7[3489]\d{9}$/.test(n)
 }
 
 export function CheckoutPage() {
   const navigate = useNavigate()
   const { items, totalPrice, clearCart } = useCart()
+  const [orderNumber] = useState(generateNumericOrderId)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [phoneError, setPhoneError] = useState('')
   const [address, setAddress] = useState('')
 
   const handleSubmit = (e) => {
@@ -19,15 +48,30 @@ export function CheckoutPage() {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       return
     }
-    const orderId = randomOrderId()
+    if (!isValidRuPhone(phone)) {
+      setPhoneError(
+        'Укажите номер в формате РФ: +7, 8 или 10 цифр без кода страны (например +7 916 123-45-67).',
+      )
+      return
+    }
+    setPhoneError('')
     clearCart()
-    navigate('/confirmation', { state: { orderId } })
+    navigate('/confirmation', { state: { orderId: orderNumber } })
   }
 
-  if (items.length === 0) {
-    return (
-      <div className="checkout-page">
-        <h1 className="checkout-page__title">Заказ</h1>
+  return (
+    <div className="checkout-page">
+      <header className="checkout-page__top">
+        <Link to="/catalog" className="checkout-page__logo" aria-label="На главную">
+          Лого
+        </Link>
+        <Link to="/cart" className="checkout-page__back-cart">
+          Вернуться в корзину
+        </Link>
+      </header>
+      <h1 className="checkout-page__title">Заказ</h1>
+
+      {items.length === 0 ? (
         <div className="checkout-page__box checkout-page__box--notice">
           <p>Корзина пуста. Добавьте товары перед оформлением.</p>
           <button
@@ -38,64 +82,91 @@ export function CheckoutPage() {
             Перейти в каталог
           </button>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="checkout-page">
-      <h1 className="checkout-page__title">Заказ</h1>
-      <form className="checkout-page__box" onSubmit={handleSubmit}>
-        <div className="checkout-page__section-bar" aria-hidden />
-        <label className="checkout-page__field">
-          <span className="visually-hidden">Имя</span>
-          <input
-            className="checkout-page__input"
-            placeholder="Имя"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            autoComplete="name"
-          />
-        </label>
-        <label className="checkout-page__field">
-          <span className="visually-hidden">Телефон</span>
-          <input
-            className="checkout-page__input"
-            type="tel"
-            placeholder="Телефон"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-            autoComplete="tel"
-          />
-        </label>
-        <label className="checkout-page__field">
-          <span className="visually-hidden">Адрес</span>
-          <textarea
-            className="checkout-page__textarea"
-            placeholder="Адрес"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-            rows={4}
-            autoComplete="street-address"
-          />
-        </label>
-        <div className="checkout-page__mock-summary" aria-hidden>
-          <span className="checkout-page__mock-line checkout-page__mock-line--long" />
-          <span className="checkout-page__mock-line checkout-page__mock-line--short" />
-        </div>
-        <div className="checkout-page__order-lines">
-          <p className="checkout-page__order-note">
-            Товаров: {items.reduce((n, l) => n + l.quantity, 0)} — на сумму{' '}
-            {totalPrice.toLocaleString('ru-RU')} ₽
+      ) : (
+        <form className="checkout-page__box" onSubmit={handleSubmit}>
+          <p className="checkout-page__order-id">
+            Номер заказа: <strong>{orderNumber}</strong>
           </p>
-        </div>
-        <button type="submit" className="checkout-page__submit">
-          Оформить заказ
-        </button>
-      </form>
+
+          <h2 className="checkout-page__subheading">Состав заказа</h2>
+          <ul className="checkout-page__items">
+            {items.map(({ product, quantity }) => {
+              const lineTotal = product.price * quantity
+              return (
+                <li key={product.id} className="checkout-page__item">
+                  <span className="checkout-page__item-name">{product.name}</span>
+                  <span className="checkout-page__item-detail">
+                    {quantity} шт. ×{' '}
+                    {product.price.toLocaleString('ru-RU')} ₽
+                  </span>
+                  <span className="checkout-page__item-sum">
+                    {lineTotal.toLocaleString('ru-RU')} ₽
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="checkout-page__total-row">
+            <span>Итого</span>
+            <span>{totalPrice.toLocaleString('ru-RU')} ₽</span>
+          </div>
+
+          <h2 className="checkout-page__heading">Данные получателя</h2>
+          <label className="checkout-page__field">
+            <span className="visually-hidden">Имя</span>
+            <input
+              className="checkout-page__input"
+              placeholder="Имя"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoComplete="name"
+            />
+          </label>
+          <label className="checkout-page__field">
+            <span className="visually-hidden">Телефон</span>
+            <input
+              id="checkout-phone"
+              className={`checkout-page__input${phoneError ? ' checkout-page__input--invalid' : ''}`}
+              type="tel"
+              placeholder="+7 (916) 123-45-67"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value)
+                if (phoneError) setPhoneError('')
+              }}
+              required
+              autoComplete="tel"
+              aria-invalid={phoneError ? true : undefined}
+              aria-describedby={phoneError ? 'checkout-phone-error' : undefined}
+            />
+          </label>
+          {phoneError ? (
+            <p id="checkout-phone-error" className="checkout-page__field-error" role="alert">
+              {phoneError}
+            </p>
+          ) : null}
+          <label className="checkout-page__field">
+            <span className="visually-hidden">Адрес</span>
+            <textarea
+              className="checkout-page__textarea"
+              placeholder="Адрес"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+              rows={4}
+              autoComplete="street-address"
+            />
+          </label>
+          <p className="checkout-page__delivery-note">
+            Оплата при получении. Доставка по городу 1–2 рабочих дня. Точное
+            время согласуем по телефону.
+          </p>
+          <button type="submit" className="checkout-page__submit">
+            Оформить заказ
+          </button>
+        </form>
+      )}
     </div>
   )
 }

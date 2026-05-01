@@ -1,1 +1,46 @@
-/* Минимальные глобальные правила приложения; детали в index.css и страницах */
+/* Оболочка сайта: на узком экране чуть компактнее */
+.app-shell {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 1.25rem);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.65rem 0.6rem 1rem;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+/* Страница на всю высоту оболочки — футер с margin-top: auto прижимается к низу */
+.app-shell > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 480px) {
+  .app-shell {
+    min-height: calc(100dvh - 1.75rem);
+    padding: 0.85rem 0.85rem 1.35rem;
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    padding: 1rem 1rem 1.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .app-shell {
+    min-height: calc(100dvh - 2.5rem);
+    padding: 1.2rem 1.35rem 1.75rem;
+  }
+}
