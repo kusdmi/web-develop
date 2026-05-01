@@ -188,9 +188,12 @@
   grid-area: qty;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
   font-size: 0.875rem;
   justify-self: start;
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 640px) {
@@ -199,20 +202,88 @@
   }
 }
 
-.cart-page__qty-input {
-  width: 3.25rem;
-  padding: 0.35rem 0.4rem;
+.cart-page__qty-stepper {
+  display: inline-flex;
+  align-items: stretch;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.cart-page__qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  min-width: 2.35rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border: none;
+  background: #cbd5e1;
+  color: #0f172a;
+  cursor: pointer;
   font: inherit;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cart-page__qty-btn:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.cart-page__qty-btn:disabled {
+  cursor: not-allowed;
+  background: #e2e8f0;
+  color: #94a3b8;
+}
+
+.cart-page__qty-btn--minus {
+  border-right: 1px solid var(--color-border);
+}
+
+.cart-page__qty-btn--plus {
+  border-left: 1px solid var(--color-border);
+}
+
+.cart-page__qty-char {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  user-select: none;
+}
+
+.cart-page__qty-input {
+  width: 2.75rem;
+  min-width: 0;
+  padding: 0.35rem 0.25rem;
+  border: none;
+  border-radius: 0;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
   text-align: center;
   background: var(--color-surface);
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  /* убираем стрелки number в Chrome — есть кнопки ± */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.cart-page__qty-input::-webkit-outer-spin-button,
+.cart-page__qty-input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
 }
 
 .cart-page__qty-input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  background: var(--color-surface-2);
 }
 
 .cart-page__qty-suffix {

@@ -56,30 +56,38 @@ export function CartProvider({ children }) {
   }, [items])
 
   const addToCart = useCallback((product, quantity = 1) => {
+    const pid = String(product.id)
     setItems((prev) => {
-      const i = prev.findIndex((line) => line.product.id === product.id)
+      const i = prev.findIndex((line) => String(line.product.id) === pid)
       if (i === -1) {
         return [...prev, { product, quantity }]
       }
       const next = [...prev]
-      next[i] = { ...next[i], quantity: next[i].quantity + quantity }
+      next[i] = {
+        ...next[i],
+        quantity: Math.min(QTY_MAX, next[i].quantity + quantity),
+      }
       return next
     })
   }, [])
 
   const setLineQuantity = useCallback((productId, quantity) => {
+    const pid = String(productId)
+    const q = Math.floor(Number(quantity))
     setItems((prev) => {
-      if (quantity <= 0) {
-        return prev.filter((line) => line.product.id !== productId)
+      if (!Number.isFinite(q) || q <= 0) {
+        return prev.filter((line) => String(line.product.id) !== pid)
       }
+      const clamped = Math.min(Math.max(1, q), QTY_MAX)
       return prev.map((line) =>
-        line.product.id === productId ? { ...line, quantity } : line,
+        String(line.product.id) === pid ? { ...line, quantity: clamped } : line,
       )
     })
   }, [])
 
   const removeLine = useCallback((productId) => {
-    setItems((prev) => prev.filter((line) => line.product.id !== productId))
+    const pid = String(productId)
+    setItems((prev) => prev.filter((line) => String(line.product.id) !== pid))
   }, [])
 
   const clearCart = useCallback(() => setItems([]), [])

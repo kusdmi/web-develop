@@ -60,27 +60,59 @@ export function CartPage() {
                 </Link>
                 <p className="cart-page__desc">{product.description}</p>
               </div>
-              <div className="cart-page__qty">
+              <div
+                className="cart-page__qty"
+                role="group"
+                aria-label={`Количество: ${product.name}`}
+              >
                 <label className="visually-hidden" htmlFor={`qty-${product.id}`}>
                   Количество {product.name}
                 </label>
-                <input
-                  id={`qty-${product.id}`}
-                  type="number"
-                  min={0}
-                  max={QTY_MAX}
-                  className="cart-page__qty-input"
-                  value={quantity}
-                  onChange={(e) => {
-                    const n = parseInt(e.target.value, 10)
-                    setLineQuantity(
-                      product.id,
-                      Number.isNaN(n)
-                        ? 0
-                        : Math.min(QTY_MAX, Math.max(0, n)),
-                    )
-                  }}
-                />
+                <div className="cart-page__qty-stepper">
+                  <button
+                    type="button"
+                    className="cart-page__qty-btn cart-page__qty-btn--minus"
+                    aria-label="Уменьшить количество"
+                    onClick={() =>
+                      setLineQuantity(product.id, quantity - 1)
+                    }
+                  >
+                    <span className="cart-page__qty-char" aria-hidden>
+                      −
+                    </span>
+                  </button>
+                  <input
+                    id={`qty-${product.id}`}
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={QTY_MAX}
+                    className="cart-page__qty-input"
+                    value={quantity}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value, 10)
+                      setLineQuantity(
+                        product.id,
+                        Number.isNaN(n)
+                          ? 0
+                          : Math.min(QTY_MAX, Math.max(0, n)),
+                      )
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="cart-page__qty-btn cart-page__qty-btn--plus"
+                    aria-label="Увеличить количество"
+                    disabled={quantity >= QTY_MAX}
+                    onClick={() =>
+                      setLineQuantity(product.id, quantity + 1)
+                    }
+                  >
+                    <span className="cart-page__qty-char" aria-hidden>
+                      +
+                    </span>
+                  </button>
+                </div>
                 <span className="cart-page__qty-suffix">шт</span>
               </div>
               <div className="cart-page__line-price">

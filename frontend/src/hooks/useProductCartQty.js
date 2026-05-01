@@ -12,7 +12,9 @@ const QTY_ZERO_DISPLAY_MS = 420
  */
 export function useProductCartQty(productId) {
   const { items, addToCart, setLineQuantity, removeLine } = useCart()
-  const line = items.find((l) => l.product.id === productId)
+  const line = items.find(
+    (l) => String(l.product.id) === String(productId),
+  )
   const inCart = Boolean(line)
   const [localQty, setLocalQty] = useState(1)
   const [showZeroAfterRemove, setShowZeroAfterRemove] = useState(false)
