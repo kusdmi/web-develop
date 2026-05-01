@@ -1,23 +1,8 @@
 import { Link, NavLink } from 'react-router-dom'
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import { useCart } from '../context/useCart'
+import { MEDIA_DESKTOP, useMatchMedia } from '../hooks/useMatchMedia'
 import './ShopHeader.css'
-
-const MQ_DESKTOP = '(min-width: 768px)'
-
-function subscribeDesktopMq(cb) {
-  const mq = window.matchMedia(MQ_DESKTOP)
-  mq.addEventListener('change', cb)
-  return () => mq.removeEventListener('change', cb)
-}
-
-function getDesktopSnapshot() {
-  return window.matchMedia(MQ_DESKTOP).matches
-}
-
-function getDesktopServerSnapshot() {
-  return false
-}
 
 const navClass = ({ isActive }) =>
   `shop-header__nav-link${isActive ? ' shop-header__nav-link--active' : ''}`
@@ -66,11 +51,7 @@ export function ShopHeader({
   categories,
   compact = false,
 }) {
-  const isDesktop = useSyncExternalStore(
-    subscribeDesktopMq,
-    getDesktopSnapshot,
-    getDesktopServerSnapshot,
-  )
+  const isDesktop = useMatchMedia(MEDIA_DESKTOP)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   useEffect(() => {

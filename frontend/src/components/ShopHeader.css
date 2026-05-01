@@ -5,8 +5,8 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border);
-  padding: 0.75rem 0.875rem 0.875rem;
-  margin-bottom: 1rem;
+  padding: clamp(0.65rem, 1.5vw, 0.9rem) clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
@@ -433,16 +433,16 @@
   transform: scale(0.98);
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+/* Узкие экраны (от 320px): корзина без второй строки — меньше риск вылезания за край */
+@media (max-width: 380px) {
+  .shop-header__cart-text span:last-child {
+    display: none;
+  }
+
+  .shop-header__cart {
+    padding: 0.5rem 0.45rem;
+    gap: 0.45rem;
+  }
 }
 
 /* Планшет и десктоп: одна линия в шапке, поиск в ряд */

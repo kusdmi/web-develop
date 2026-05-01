@@ -21,6 +21,7 @@ function ProductDetail({ product }) {
       <div className="product-page__info">
         <p className="product-page__category">{product.category}</p>
         <h1 className="product-page__title">{product.name}</h1>
+        <h2 className="visually-hidden">Описание</h2>
         <p className="product-page__description">{product.description}</p>
         <p className="product-page__price">
           {product.price.toLocaleString('ru-RU')} ₽

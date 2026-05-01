@@ -55,7 +55,20 @@
 
   .catalog-page__main {
     grid-template-columns: 13.5rem minmax(0, 1fr);
-    gap: 1.5rem;
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+  }
+}
+
+/* Очень широкие мониторы — четыре колонки, чуть шире сайдбар */
+@media (min-width: 1400px) {
+  .catalog-page__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1rem, 1.25vw, 1.35rem);
+  }
+
+  .catalog-page__main {
+    grid-template-columns: 14.5rem minmax(0, 1fr);
+    gap: clamp(1.5rem, 2vw, 2.25rem);
   }
 }
 

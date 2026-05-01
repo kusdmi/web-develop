@@ -1,11 +1,11 @@
 .catalog-slider {
   position: relative;
-  min-height: 400px;
-  margin: 0 0 1.25rem;
+  min-height: clamp(13rem, 32vw, 24rem);
+  margin: 0 0 clamp(1rem, 2.5vw, 1.75rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 1.25rem;
+  padding: clamp(1rem, 3vw, 2rem) clamp(0.85rem, 3vw, 2.5rem);
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: linear-gradient(
@@ -105,8 +105,8 @@
 
 @media (max-width: 480px) {
   .catalog-slider {
-    min-height: 400px;
-    padding: 1.25rem 0.65rem;
+    min-height: clamp(12rem, 42vw, 17rem);
+    padding: 1rem 0.65rem;
   }
 
   .catalog-slider__arrow {
@@ -118,7 +118,7 @@
 
 @media (min-width: 768px) {
   .catalog-slider {
-    min-height: 400px;
-    padding: 2rem 2.5rem;
+    min-height: clamp(15rem, 28vw, 26rem);
+    padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1.5rem, 4vw, 2.75rem);
   }
 }
