@@ -1,0 +1,54 @@
+.confirmation-page {
+  min-height: 100%;
+  padding: 1rem 0.75rem 2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.confirmation-page__title {
+  margin: 0 0 1.25rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+}
+
+.confirmation-page__box {
+  width: 100%;
+  max-width: 24rem;
+  border: 1px solid #333;
+  background: #f0f0f0;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.confirmation-page__msg,
+.confirmation-page__order {
+  margin: 0;
+  font-size: 1rem;
+  color: #111;
+  line-height: 1.45;
+}
+
+.confirmation-page__home {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #333;
+  background: #e0e0e0;
+  color: #111;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.confirmation-page__home:hover,
+.confirmation-page__home:focus-visible {
+  background: #d0d0d0;
+}

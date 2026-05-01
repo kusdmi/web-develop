@@ -1,0 +1,35 @@
+.filter-sidebar {
+  background: #e8e8e8;
+  border: 1px solid #333;
+  padding: 1rem;
+  align-self: start;
+}
+
+.filter-sidebar__title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.filter-sidebar__block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-sidebar__label {
+  font-size: 0.875rem;
+  color: #111;
+}
+
+.filter-sidebar__output {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.filter-sidebar input[type='range'] {
+  width: 100%;
+  max-width: 100%;
+}

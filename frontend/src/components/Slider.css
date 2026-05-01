@@ -1,0 +1,17 @@
+.catalog-slider {
+  min-height: 8rem;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d8d8d8;
+  border: 1px solid #333;
+  color: #111;
+  font-size: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  .catalog-slider {
+    min-height: 10rem;
+  }
+}
