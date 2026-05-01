@@ -1,14 +1,18 @@
-# E-commerce Microservices (FastAPI)
+# Интернет-магазин: микросервисы и фронтенд
 
-В проекте реализованы два микросервиса согласно ТЗ:
+В репозитории два направления:
 
-- `products_service` — управление товарами
-- `orders_service` — управление заказами
+- **Backend** — два микросервиса на FastAPI по ТЗ.
+- **Frontend** — пользовательская витрина на React (папка `frontend`).
 
-> Микросервис админ-панели на данном этапе не реализуется.
-> Аутентификация/авторизация не используются.
+> Админ-панель и аутентификация на данном этапе не реализованы.
 
-## Быстрый запуск
+## Микросервисы (FastAPI)
+
+- `products_service` — каталог и CRUD по товарам.
+- `orders_service` — заказы и смена статуса.
+
+### Быстрый запуск
 
 1. Установить зависимости:
 
@@ -18,12 +22,12 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Указать переменные окружения (опционально, есть значения по умолчанию):
+2. При необходимости задать переменные окружения (есть значения по умолчанию):
 
-- `PRODUCTS_DATABASE_URL` (по умолчанию `postgresql+psycopg2://postgres:postgres@localhost:5432/products_db`)
-- `ORDERS_DATABASE_URL` (по умолчанию `postgresql+psycopg2://postgres:postgres@localhost:5432/orders_db`)
+- `PRODUCTS_DATABASE_URL` — по умолчанию `postgresql+psycopg2://postgres:postgres@localhost:5432/products_db`
+- `ORDERS_DATABASE_URL` — по умолчанию `postgresql+psycopg2://postgres:postgres@localhost:5432/orders_db`
 
-3. Применить SQL-скрипты из директории `sql` к соответствующим БД.
+3. Применить SQL-скрипты из каталога `sql` к соответствующим базам.
 
 4. Запустить сервисы в двух терминалах:
 
@@ -32,20 +36,39 @@ uvicorn products_service.app.main:app --reload --port 8001
 uvicorn orders_service.app.main:app --reload --port 8002
 ```
 
-## API
+### API
 
-### Products Service (порт 8001)
+**Products (порт 8001)**
+
 - `GET /products`
 - `GET /products/{product_id}`
 - `POST /products`
 - `PUT /products/{product_id}`
 - `DELETE /products/{product_id}`
 
-### Orders Service (порт 8002)
+**Orders (порт 8002)**
+
 - `POST /orders`
 - `GET /orders`
 - `GET /orders/{order_id}`
 - `PUT /orders/{order_id}/status`
+
+## Фронтенд (React + Vite)
+
+Витрина с маршрутизацией (React Router): каталог, карточка товара, корзина, оформление заказа, страница подтверждения. Данные пока **моковые**, без подключения к API.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Сборка и проверка линтером:
+
+```bash
+npm run build
+npm run lint
+```
 
 ## Запуск в Docker
 
@@ -53,20 +76,19 @@ uvicorn orders_service.app.main:app --reload --port 8002
 docker compose up --build -d
 ```
 
-Сервисы будут доступны:
+После старта:
 
 - Products API: `http://localhost:8001`
 - Orders API: `http://localhost:8002`
 
-Остановить:
+Остановка:
 
 ```bash
 docker compose down
 ```
 
-Остановить и удалить volumes БД:
+Остановка с удалением томов БД:
 
 ```bash
 docker compose down -v
 ```
-# web-develop
