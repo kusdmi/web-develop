@@ -12,7 +12,12 @@ export function ProductCard({ product }) {
       <Link to={`/product/${product.id}`} className="product-card__top">
         <div
           className="product-card__image"
-          style={{ backgroundColor: product.imageColor }}
+          style={{
+            backgroundColor: `hsl(${(Number(product.id) * 47) % 360} 55% 88%)`,
+            backgroundImage: product.imageUrl ? `url(${product.imageUrl})` : undefined,
+            backgroundSize: product.imageUrl ? 'cover' : undefined,
+            backgroundPosition: product.imageUrl ? 'center' : undefined,
+          }}
         >
           <span className="product-card__image-label">товар</span>
         </div>

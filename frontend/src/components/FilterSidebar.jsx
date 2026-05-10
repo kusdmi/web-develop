@@ -81,83 +81,95 @@ export function FilterSidebar({
         role="region"
         aria-labelledby="filter-sidebar-heading"
       >
-      <div className="filter-sidebar__block">
-        <label className="filter-sidebar__label" htmlFor="filter-price">
-          Цена до, ₽
-        </label>
-        <input
-          id="filter-price"
-          type="range"
-          min={0}
-          max={priceCap}
-          step={100}
-          value={maxPrice}
-          onChange={(e) => onMaxPriceChange(Number(e.target.value))}
-        />
-        <output className="filter-sidebar__output" htmlFor="filter-price">
-          {maxPrice.toLocaleString('ru-RU')} ₽
-        </output>
-      </div>
-      <div className="filter-sidebar__block filter-sidebar__block--group">
-        <p className="filter-sidebar__label">Цоколь</p>
-        <div className="filter-sidebar__group" role="group" aria-label="Цоколь">
-          {sockets.map((s) => (
-            <label key={s} className="filter-sidebar__check">
-              <input
-                type="checkbox"
-                checked={socketFilter.includes(s)}
-                onChange={() => toggleValue(s, socketFilter, onSocketFilterChange)}
-              />
-              <span>{s}</span>
-            </label>
-          ))}
+        <div className="filter-sidebar__block">
+          <label className="filter-sidebar__label" htmlFor="filter-price">
+            Цена до, ₽
+          </label>
+          <input
+            id="filter-price"
+            type="range"
+            min={0}
+            max={priceCap}
+            step={100}
+            value={maxPrice}
+            onChange={(e) => onMaxPriceChange(Number(e.target.value))}
+          />
+          <output className="filter-sidebar__output" htmlFor="filter-price">
+            {maxPrice.toLocaleString('ru-RU')} ₽
+          </output>
         </div>
-      </div>
-      <div className="filter-sidebar__block filter-sidebar__block--group">
-        <p className="filter-sidebar__label">Мощность</p>
-        <div className="filter-sidebar__group" role="group" aria-label="Мощность">
-          {powers.map((w) => (
-            <label key={w} className="filter-sidebar__check">
-              <input
-                type="checkbox"
-                checked={powerFilter.includes(w)}
-                onChange={() => toggleValue(w, powerFilter, onPowerFilterChange)}
-              />
-              <span>{w} Вт</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      <div className="filter-sidebar__block filter-sidebar__block--group">
-        <p className="filter-sidebar__label">Производитель</p>
-        <div className="filter-sidebar__group" role="group" aria-label="Производитель">
-          {brands.map((b) => (
-            <label key={b} className="filter-sidebar__check">
-              <input
-                type="checkbox"
-                checked={brandFilter.includes(b)}
-                onChange={() => toggleValue(b, brandFilter, onBrandFilterChange)}
-              />
-              <span>{b}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      <div className="filter-sidebar__block filter-sidebar__block--group">
-        <p className="filter-sidebar__label">Форма</p>
-        <div className="filter-sidebar__group" role="group" aria-label="Форма">
-          {shapes.map((shape) => (
-            <label key={shape} className="filter-sidebar__check">
-              <input
-                type="checkbox"
-                checked={shapeFilter.includes(shape)}
-                onChange={() => toggleValue(shape, shapeFilter, onShapeFilterChange)}
-              />
-              <span>{shape}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+
+        {sockets?.length ? (
+          <div className="filter-sidebar__block filter-sidebar__block--group">
+            <p className="filter-sidebar__label">Цоколь</p>
+            <div className="filter-sidebar__group" role="group" aria-label="Цоколь">
+              {sockets.map((s) => (
+                <label key={s} className="filter-sidebar__check">
+                  <input
+                    type="checkbox"
+                    checked={socketFilter.includes(s)}
+                    onChange={() => toggleValue(s, socketFilter, onSocketFilterChange)}
+                  />
+                  <span>{s}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {powers?.length ? (
+          <div className="filter-sidebar__block filter-sidebar__block--group">
+            <p className="filter-sidebar__label">Мощность</p>
+            <div className="filter-sidebar__group" role="group" aria-label="Мощность">
+              {powers.map((w) => (
+                <label key={w} className="filter-sidebar__check">
+                  <input
+                    type="checkbox"
+                    checked={powerFilter.includes(w)}
+                    onChange={() => toggleValue(w, powerFilter, onPowerFilterChange)}
+                  />
+                  <span>{w} Вт</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {brands?.length ? (
+          <div className="filter-sidebar__block filter-sidebar__block--group">
+            <p className="filter-sidebar__label">Производитель</p>
+            <div className="filter-sidebar__group" role="group" aria-label="Производитель">
+              {brands.map((b) => (
+                <label key={b} className="filter-sidebar__check">
+                  <input
+                    type="checkbox"
+                    checked={brandFilter.includes(b)}
+                    onChange={() => toggleValue(b, brandFilter, onBrandFilterChange)}
+                  />
+                  <span>{b}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {shapes?.length ? (
+          <div className="filter-sidebar__block filter-sidebar__block--group">
+            <p className="filter-sidebar__label">Форма</p>
+            <div className="filter-sidebar__group" role="group" aria-label="Форма">
+              {shapes.map((shape) => (
+                <label key={shape} className="filter-sidebar__check">
+                  <input
+                    type="checkbox"
+                    checked={shapeFilter.includes(shape)}
+                    onChange={() => toggleValue(shape, shapeFilter, onShapeFilterChange)}
+                  />
+                  <span>{shape}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </aside>
   )

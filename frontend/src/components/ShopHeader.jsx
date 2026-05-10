@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { useCart } from '../context/useCart'
+import { useSelector } from 'react-redux'
+import { selectCartTotalItems, selectCartTotalPrice } from '../store/cartSlice'
 import { MEDIA_DESKTOP, useMatchMedia } from '../hooks/useMatchMedia'
 import './ShopHeader.css'
 
@@ -8,7 +9,8 @@ const navClass = ({ isActive }) =>
   `shop-header__nav-link${isActive ? ' shop-header__nav-link--active' : ''}`
 
 function CartLink({ className = '', onNavigate }) {
-  const { totalItems, totalPrice } = useCart()
+  const totalItems = useSelector(selectCartTotalItems)
+  const totalPrice = useSelector(selectCartTotalPrice)
   return (
     <Link
       to="/cart"

@@ -1,9 +1,22 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getProductById } from '../data/mockProducts'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchProductById,
+  selectProductById,
+  selectProductByIdError,
+  selectProductByIdStatus,
+} from '../store/productsSlice'
 import { ShopHeader } from '../components/ShopHeader'
 import { Footer } from '../components/Footer'
 import { useProductCartQty, QTY_MAX } from '../hooks/useProductCartQty'
 import './ProductPage.css'
+
+function productPlaceholderColor(id) {
+  const n = Number(id) || 0
+  const hue = (n * 47) % 360
+  return `hsl(${hue} 55% 88%)`
+}
 
 function ProductDetail({ product }) {
   const navigate = useNavigate()
@@ -14,7 +27,12 @@ function ProductDetail({ product }) {
     <main className="product-page__main">
       <div
         className="product-page__image"
-        style={{ backgroundColor: product.imageColor }}
+        style={{
+          backgroundColor: productPlaceholderColor(product.id),
+          backgroundImage: product.imageUrl ? `url(${product.imageUrl})` : undefined,
+          backgroundSize: product.imageUrl ? 'cover' : undefined,
+          backgroundPosition: product.imageUrl ? 'center' : undefined,
+        }}
       >
         <span className="product-page__image-label">товар</span>
       </div>
@@ -22,7 +40,9 @@ function ProductDetail({ product }) {
         <p className="product-page__category">{product.category}</p>
         <h1 className="product-page__title">{product.name}</h1>
         <h2 className="visually-hidden">Описание</h2>
-        <p className="product-page__description">{product.description}</p>
+        <p className="product-page__description">
+          {product.description || 'Описание отсутствует.'}
+        </p>
         <p className="product-page__price">
           {product.price.toLocaleString('ru-RU')} ₽
         </p>
@@ -89,13 +109,37 @@ function ProductDetail({ product }) {
 
 export function ProductPage() {
   const { id } = useParams()
-  const product = getProductById(id)
+  const dispatch = useDispatch()
+  const status = useSelector((s) => selectProductByIdStatus(s, id))
+  const error = useSelector((s) => selectProductByIdError(s, id))
+  const product = useSelector((s) => selectProductById(s, id))
+
+  useEffect(() => {
+    if (!id) return
+    if (product) return
+    if (status === 'loading') return
+    dispatch(fetchProductById(id))
+  }, [dispatch, id, product, status])
+
+  if (!product && status === 'loading') {
+    return (
+      <div className="product-page">
+        <ShopHeader compact />
+        <div className="product-page--missing">
+          <p>Загрузка…</p>
+          <Link to="/catalog">В каталог</Link>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
   if (!product) {
     return (
       <div className="product-page">
+        <ShopHeader compact />
         <div className="product-page--missing">
-          <p>Товар не найден</p>
+          <p>{error ? error : 'Товар не найден'}</p>
           <Link to="/catalog">В каталог</Link>
         </div>
         <Footer />

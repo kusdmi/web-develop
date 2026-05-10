@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { useCart } from '../context/useCart'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  addToCart,
+  removeLine,
+  selectCartLines,
+  setLineQuantity,
+  QTY_MAX,
+} from '../store/cartSlice'
 
-export const QTY_MAX = 99
+export { QTY_MAX } from '../store/cartSlice'
 
 /** Сколько мс показывать «0» после снятия последней единицы с корзины */
 const QTY_ZERO_DISPLAY_MS = 420
@@ -11,10 +18,10 @@ const QTY_ZERO_DISPLAY_MS = 420
  * после добавления в корзину — то же число, что в корзине; ± меняют корзину.
  */
 export function useProductCartQty(productId) {
-  const { items, addToCart, setLineQuantity, removeLine } = useCart()
-  const line = items.find(
-    (l) => String(l.product.id) === String(productId),
-  )
+  const dispatch = useDispatch()
+  const lines = useSelector(selectCartLines)
+  const pid = Number(productId)
+  const line = lines.find((l) => l.productId === pid)
   const inCart = Boolean(line)
   const [localQty, setLocalQty] = useState(1)
   const [showZeroAfterRemove, setShowZeroAfterRemove] = useState(false)
@@ -51,7 +58,7 @@ export function useProductCartQty(productId) {
     if (qtyBusy) return
     if (inCart) {
       const current = line.quantity
-      setLineQuantity(productId, Math.min(QTY_MAX, current + 1))
+      dispatch(setLineQuantity({ productId: pid, quantity: Math.min(QTY_MAX, current + 1) }))
     } else {
       setLocalQty((q) => Math.min(QTY_MAX, q + 1))
     }
@@ -63,14 +70,14 @@ export function useProductCartQty(productId) {
       const current = line.quantity
       if (current === 1) {
         setShowZeroAfterRemove(true)
-        setLineQuantity(productId, 0)
+        dispatch(setLineQuantity({ productId: pid, quantity: 0 }))
         clearZeroTimeout()
         zeroTimeoutRef.current = setTimeout(() => {
           setShowZeroAfterRemove(false)
           zeroTimeoutRef.current = null
         }, QTY_ZERO_DISPLAY_MS)
       } else {
-        setLineQuantity(productId, current - 1)
+        dispatch(setLineQuantity({ productId: pid, quantity: current - 1 }))
       }
     } else {
       setLocalQty((q) => Math.max(1, q - 1))
@@ -80,14 +87,15 @@ export function useProductCartQty(productId) {
   const removeFromCart = () => {
     clearZeroTimeout()
     setShowZeroAfterRemove(false)
-    removeLine(productId)
+    dispatch(removeLine({ productId: pid }))
   }
 
   return {
     qty,
     inCart,
     qtyBusy,
-    addToCart,
+    addToCart: (_product, quantity = 1) =>
+      dispatch(addToCart({ productId: pid, quantity })),
     increment,
     decrement,
     removeFromCart,

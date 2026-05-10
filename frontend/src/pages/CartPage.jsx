@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/useCart'
-import { QTY_MAX } from '../hooks/useProductCartQty'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  selectCartEnrichedLines,
+  selectCartTotalPrice,
+  setLineQuantity,
+  removeLine,
+  QTY_MAX,
+} from '../store/cartSlice'
 import './CartPage.css'
 
 function TrashIcon() {
@@ -27,7 +33,9 @@ function TrashIcon() {
 }
 
 export function CartPage() {
-  const { items, totalPrice, setLineQuantity, removeLine } = useCart()
+  const dispatch = useDispatch()
+  const items = useSelector(selectCartEnrichedLines)
+  const totalPrice = useSelector(selectCartTotalPrice)
 
   return (
     <div className="cart-page">
@@ -42,31 +50,40 @@ export function CartPage() {
       <h1 className="cart-page__title">Корзина</h1>
       <div className="cart-page__box">
         <ul className="cart-page__list">
-          {items.map(({ product, quantity }) => (
-            <li key={product.id} className="cart-page__item">
+          {items.map(({ product, productId, quantity }) => (
+            <li key={productId} className="cart-page__item">
               <Link
-                to={`/product/${product.id}`}
+                to={`/product/${productId}`}
                 className="cart-page__thumb-link"
-                aria-label={`Открыть ${product.name}`}
+                aria-label={`Открыть ${product?.name ?? 'товар'}`}
               >
                 <div
                   className="cart-page__thumb"
-                  style={{ backgroundColor: product.imageColor }}
+                  style={{
+                    backgroundColor: `hsl(${(productId * 47) % 360} 55% 88%)`,
+                    backgroundImage: product?.imageUrl ? `url(${product.imageUrl})` : undefined,
+                    backgroundSize: product?.imageUrl ? 'cover' : undefined,
+                    backgroundPosition: product?.imageUrl ? 'center' : undefined,
+                  }}
                 />
               </Link>
               <div className="cart-page__meta">
-                <Link to={`/product/${product.id}`} className="cart-page__name-link">
-                  <p className="cart-page__name">{product.name}</p>
+                <Link to={`/product/${productId}`} className="cart-page__name-link">
+                  <p className="cart-page__name">
+                    {product?.name ?? `Товар #${productId}`}
+                  </p>
                 </Link>
-                <p className="cart-page__desc">{product.description}</p>
+                <p className="cart-page__desc">
+                  {product?.description || 'Описание отсутствует.'}
+                </p>
               </div>
               <div
                 className="cart-page__qty"
                 role="group"
-                aria-label={`Количество: ${product.name}`}
+                aria-label={`Количество: ${product?.name ?? `товар #${productId}`}`}
               >
-                <label className="visually-hidden" htmlFor={`qty-${product.id}`}>
-                  Количество {product.name}
+                <label className="visually-hidden" htmlFor={`qty-${productId}`}>
+                  Количество {product?.name ?? `товар #${productId}`}
                 </label>
                 <div className="cart-page__qty-stepper">
                   <button
@@ -74,7 +91,7 @@ export function CartPage() {
                     className="cart-page__qty-btn cart-page__qty-btn--minus"
                     aria-label="Уменьшить количество"
                     onClick={() =>
-                      setLineQuantity(product.id, quantity - 1)
+                      dispatch(setLineQuantity({ productId, quantity: quantity - 1 }))
                     }
                   >
                     <span className="cart-page__qty-char" aria-hidden>
@@ -82,7 +99,7 @@ export function CartPage() {
                     </span>
                   </button>
                   <input
-                    id={`qty-${product.id}`}
+                    id={`qty-${productId}`}
                     type="number"
                     inputMode="numeric"
                     min={1}
@@ -91,11 +108,11 @@ export function CartPage() {
                     value={quantity}
                     onChange={(e) => {
                       const n = parseInt(e.target.value, 10)
-                      setLineQuantity(
-                        product.id,
-                        Number.isNaN(n)
-                          ? 0
-                          : Math.min(QTY_MAX, Math.max(0, n)),
+                      dispatch(
+                        setLineQuantity({
+                          productId,
+                          quantity: Number.isNaN(n) ? 0 : Math.min(QTY_MAX, Math.max(0, n)),
+                        }),
                       )
                     }}
                   />
@@ -105,7 +122,7 @@ export function CartPage() {
                     aria-label="Увеличить количество"
                     disabled={quantity >= QTY_MAX}
                     onClick={() =>
-                      setLineQuantity(product.id, quantity + 1)
+                      dispatch(setLineQuantity({ productId, quantity: quantity + 1 }))
                     }
                   >
                     <span className="cart-page__qty-char" aria-hidden>
@@ -116,13 +133,13 @@ export function CartPage() {
                 <span className="cart-page__qty-suffix">шт</span>
               </div>
               <div className="cart-page__line-price">
-                {(product.price * quantity).toLocaleString('ru-RU')} ₽
+                {((Number(product?.price) || 0) * quantity).toLocaleString('ru-RU')} ₽
               </div>
               <button
                 type="button"
                 className="cart-page__remove"
-                onClick={() => removeLine(product.id)}
-                aria-label={`Удалить «${product.name}» из корзины`}
+                onClick={() => dispatch(removeLine({ productId }))}
+                aria-label={`Удалить «${product?.name ?? `товар #${productId}` }» из корзины`}
               >
                 <TrashIcon />
                 <span className="cart-page__remove-text">Удалить</span>

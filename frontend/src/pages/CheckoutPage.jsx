@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/useCart'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  clearCart,
+  selectCartEnrichedLines,
+  selectCartTotalPrice,
+} from '../store/cartSlice'
+import {
+  createOrder,
+  selectCreateOrderError,
+  selectCreateOrderStatus,
+} from '../store/ordersSlice'
 import './CheckoutPage.css'
 
 /** Только цифры, длина 8 — показывается на странице и уходит на подтверждение */
@@ -36,14 +46,19 @@ function isValidRuPhone(raw) {
 
 export function CheckoutPage() {
   const navigate = useNavigate()
-  const { items, totalPrice, clearCart } = useCart()
+  const dispatch = useDispatch()
+  const items = useSelector(selectCartEnrichedLines)
+  const totalPrice = useSelector(selectCartTotalPrice)
+  const createStatus = useSelector(selectCreateOrderStatus)
+  const createError = useSelector(selectCreateOrderError)
   const [orderNumber] = useState(generateNumericOrderId)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
+  const [email, setEmail] = useState('')
   const [address, setAddress] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!name.trim() || !phone.trim() || !address.trim()) {
       return
@@ -55,8 +70,27 @@ export function CheckoutPage() {
       return
     }
     setPhoneError('')
-    clearCart()
-    navigate('/confirmation', { state: { orderId: orderNumber } })
+
+    const payload = {
+      customer_name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() ? email.trim() : null,
+      address: address.trim(),
+      items: items.map((l) => ({
+        product_id: l.productId,
+        quantity: l.quantity,
+      })),
+    }
+
+    try {
+      const created = await dispatch(createOrder(payload)).unwrap()
+      dispatch(clearCart())
+      navigate('/confirmation', {
+        state: { orderId: String(created?.id ?? orderNumber) },
+      })
+    } catch {
+      // ошибка уже в store
+    }
   }
 
   return (
@@ -90,14 +124,17 @@ export function CheckoutPage() {
 
           <h2 className="checkout-page__subheading">Состав заказа</h2>
           <ul className="checkout-page__items">
-            {items.map(({ product, quantity }) => {
-              const lineTotal = product.price * quantity
+            {items.map(({ product, productId, quantity }) => {
+              const price = Number(product?.price) || 0
+              const lineTotal = price * quantity
               return (
-                <li key={product.id} className="checkout-page__item">
-                  <span className="checkout-page__item-name">{product.name}</span>
+                <li key={productId} className="checkout-page__item">
+                  <span className="checkout-page__item-name">
+                    {product?.name ?? `Товар #${productId}`}
+                  </span>
                   <span className="checkout-page__item-detail">
                     {quantity} шт. ×{' '}
-                    {product.price.toLocaleString('ru-RU')} ₽
+                    {price.toLocaleString('ru-RU')} ₽
                   </span>
                   <span className="checkout-page__item-sum">
                     {lineTotal.toLocaleString('ru-RU')} ₽
@@ -141,6 +178,17 @@ export function CheckoutPage() {
               aria-describedby={phoneError ? 'checkout-phone-error' : undefined}
             />
           </label>
+          <label className="checkout-page__field">
+            <span className="visually-hidden">Email</span>
+            <input
+              className="checkout-page__input"
+              type="email"
+              placeholder="Email (необязательно)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </label>
           {phoneError ? (
             <p id="checkout-phone-error" className="checkout-page__field-error" role="alert">
               {phoneError}
@@ -162,8 +210,17 @@ export function CheckoutPage() {
             Оплата при получении. Доставка по городу 1–2 рабочих дня. Точное
             время согласуем по телефону.
           </p>
-          <button type="submit" className="checkout-page__submit">
-            Оформить заказ
+          {createStatus === 'failed' && createError ? (
+            <p className="checkout-page__field-error" role="alert">
+              {createError}
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            className="checkout-page__submit"
+            disabled={createStatus === 'loading'}
+          >
+            {createStatus === 'loading' ? 'Отправляем…' : 'Оформить заказ'}
           </button>
         </form>
       )}
