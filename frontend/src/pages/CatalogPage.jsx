@@ -14,6 +14,45 @@ import { FilterSidebar } from '../components/FilterSidebar'
 import { ProductCard } from '../components/ProductCard'
 import './CatalogPage.css'
 
+const SOCKET_REGEX = /\b(Е14|Е27|G9|GU5\.3|GU10|G13|Лента)\b/i
+const POWER_REGEX = /(\d+)\s*Вт/i
+const KNOWN_BRANDS = [
+  'Технолюкс',
+  'Маяк',
+  'Camelion',
+  'Gauss',
+  'Philips',
+  'Osram',
+  'Navigator',
+  'ЭРА',
+]
+const KNOWN_SHAPES = [
+  'Груша',
+  'Свеча',
+  'Шар',
+  'Капсула',
+  'Рефлектор',
+  'Трубка',
+  'Спираль',
+  'U-образная',
+  'Спот',
+  'Лента',
+]
+
+function parseProductAttrs(product) {
+  const source = `${product.name || ''} ${product.description || ''}`
+  const socketMatch = source.match(SOCKET_REGEX)
+  const powerMatch = source.match(POWER_REGEX)
+  const brand = KNOWN_BRANDS.find((b) => source.toLowerCase().includes(b.toLowerCase())) || null
+  const shape = KNOWN_SHAPES.find((s) => source.toLowerCase().includes(s.toLowerCase())) || null
+  return {
+    socket: socketMatch ? socketMatch[1].toUpperCase() : null,
+    powerW: powerMatch ? Number(powerMatch[1]) : null,
+    brand,
+    shape,
+  }
+}
+
 export function CatalogPage() {
   const products = useSelector(selectAllProducts)
   const status = useSelector(selectProductsStatus)
@@ -34,10 +73,27 @@ export function CatalogPage() {
   const [brandFilter, setBrandFilter] = useState([])
   const [shapeFilter, setShapeFilter] = useState([])
 
-  const catalogFilterOptions = useMemo(
-    () => ({ sockets: [], powers: [], brands: [], shapes: [] }),
-    [],
-  )
+  const catalogFilterOptions = useMemo(() => {
+    const sockets = new Set()
+    const powers = new Set()
+    const brands = new Set()
+    const shapes = new Set()
+
+    for (const p of products) {
+      const attrs = parseProductAttrs(p)
+      if (attrs.socket) sockets.add(attrs.socket)
+      if (attrs.powerW != null) powers.add(attrs.powerW)
+      if (attrs.brand) brands.add(attrs.brand)
+      if (attrs.shape) shapes.add(attrs.shape)
+    }
+
+    return {
+      sockets: Array.from(sockets).sort((a, b) => a.localeCompare(b, 'ru')),
+      powers: Array.from(powers).sort((a, b) => a - b),
+      brands: Array.from(brands).sort((a, b) => a.localeCompare(b, 'ru')),
+      shapes: Array.from(shapes).sort((a, b) => a.localeCompare(b, 'ru')),
+    }
+  }, [products])
 
   const runSearch = () => {
     const q = searchQuery.trim()
@@ -51,8 +107,13 @@ export function CatalogPage() {
   const filtered = useMemo(() => {
     const q = appliedQuery.toLowerCase()
     return products.filter((p) => {
+      const attrs = parseProductAttrs(p)
       const catOk = !categoryFilter || p.category === categoryFilter
       const priceOk = p.price <= maxPrice
+      const socketOk = socketFilter.length === 0 || (attrs.socket && socketFilter.includes(attrs.socket))
+      const powerOk = powerFilter.length === 0 || (attrs.powerW != null && powerFilter.includes(attrs.powerW))
+      const brandOk = brandFilter.length === 0 || (attrs.brand && brandFilter.includes(attrs.brand))
+      const shapeOk = shapeFilter.length === 0 || (attrs.shape && shapeFilter.includes(attrs.shape))
       const textOk =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -60,6 +121,10 @@ export function CatalogPage() {
       return (
         catOk &&
         priceOk &&
+        socketOk &&
+        powerOk &&
+        brandOk &&
+        shapeOk &&
         textOk
       )
     })
@@ -68,6 +133,10 @@ export function CatalogPage() {
     appliedQuery,
     categoryFilter,
     maxPrice,
+    socketFilter,
+    powerFilter,
+    brandFilter,
+    shapeFilter,
   ])
 
   return (
