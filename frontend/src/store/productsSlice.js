@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
 import { fetchJson } from '../api/fetchJson'
 
 export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
@@ -94,18 +94,25 @@ export const productsReducer = productsSlice.reducer
 
 export const selectProductsStatus = (state) => state.products.status
 export const selectProductsError = (state) => state.products.error
-export const selectAllProducts = (state) => state.products.ids.map((id) => state.products.entities[id])
+const selectProductIds = (state) => state.products.ids
+const selectProductEntities = (state) => state.products.entities
+
+export const selectAllProducts = createSelector(
+  [selectProductIds, selectProductEntities],
+  (ids, entities) => ids.map((id) => entities[id]),
+)
+
 export const selectProductById = (state, id) => state.products.entities[Number(id)] || null
 export const selectProductByIdStatus = (state, id) =>
   state.products.byIdStatus[Number(id)] || 'idle'
 export const selectProductByIdError = (state, id) => state.products.byIdError[Number(id)] || null
 
-export const selectCategories = (state) => {
+export const selectCategories = createSelector([selectAllProducts], (products) => {
   const set = new Set()
-  for (const id of state.products.ids) {
-    const c = state.products.entities[id]?.category
+  for (const p of products) {
+    const c = p?.category
     if (c) set.add(c)
   }
   return ['Все', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'))]
-}
+})
 
