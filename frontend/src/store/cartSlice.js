@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 import { readStoredCart, writeStoredCart } from './storage'
 
 export const QTY_MAX = 99
@@ -59,24 +59,29 @@ export const { addToCart, setLineQuantity, removeLine, clearCart } = cartSlice.a
 export const cartReducer = cartSlice.reducer
 
 export const selectCartLines = (state) => state.cart.lines
-export const selectCartTotalItems = (state) =>
-  state.cart.lines.reduce((s, l) => s + l.quantity, 0)
+const selectProductEntities = (state) => state.products.entities
 
-export const selectCartEnrichedLines = (state) => {
-  const byId = state.products.entities
-  return state.cart.lines.map((l) => ({
+export const selectCartTotalItems = createSelector([selectCartLines], (lines) =>
+  lines.reduce((s, l) => s + l.quantity, 0),
+)
+
+export const selectCartEnrichedLines = createSelector(
+  [selectCartLines, selectProductEntities],
+  (lines, byId) =>
+    lines.map((l) => ({
     product: byId[l.productId] || null,
     productId: l.productId,
     quantity: l.quantity,
-  }))
-}
+    })),
+)
 
-export const selectCartTotalPrice = (state) => {
-  const byId = state.products.entities
-  return state.cart.lines.reduce((s, l) => {
+export const selectCartTotalPrice = createSelector(
+  [selectCartLines, selectProductEntities],
+  (lines, byId) =>
+    lines.reduce((s, l) => {
     const p = byId[l.productId]
     const price = p ? Number(p.price) : 0
     return s + price * l.quantity
-  }, 0)
-}
+    }, 0),
+)
 
