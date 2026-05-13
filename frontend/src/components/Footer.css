@@ -24,3 +24,7 @@
   font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
+
+.site-footer__hint + .site-footer__hint {
+  margin-top: 0.35rem;
+}

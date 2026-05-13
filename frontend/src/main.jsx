@@ -4,11 +4,14 @@ import { Provider } from 'react-redux'
 import './index.css'
 import App from './App.jsx'
 import { store } from './store/store'
+import { AdminAuthProvider } from './admin/AdminAuthProvider'
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <AdminAuthProvider>
+        <App />
+      </AdminAuthProvider>
     </BrowserRouter>
   </Provider>,
 )

@@ -42,11 +42,17 @@ services:
     container_name: products-service
     environment:
       PRODUCTS_DATABASE_URL: postgresql+psycopg2://postgres:postgres@products-db:5432/products_db
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
+      ADMIN_JWT_SECRET: dev-admin-jwt-secret-change-in-production
+      PRODUCTS_UPLOAD_DIR: /app/uploads
     ports:
       - "8001:8001"
     depends_on:
       products-db:
         condition: service_healthy
+    volumes:
+      - products_uploads:/app/uploads
 
   orders-service:
     build:
@@ -56,6 +62,9 @@ services:
     environment:
       ORDERS_DATABASE_URL: postgresql+psycopg2://postgres:postgres@orders-db:5432/orders_db
       PRODUCTS_SERVICE_URL: http://products-service:8001
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
+      ADMIN_JWT_SECRET: dev-admin-jwt-secret-change-in-production
     ports:
       - "8002:8002"
     depends_on:
@@ -67,3 +76,4 @@ services:
 volumes:
   products_db_data:
   orders_db_data:
+  products_uploads:

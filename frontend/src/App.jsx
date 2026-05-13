@@ -9,6 +9,10 @@ import { CheckoutPage } from './pages/CheckoutPage'
 import { ConfirmationPage } from './pages/ConfirmationPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { AdminLayout } from './admin/AdminLayout'
+import { RequireAdmin } from './admin/RequireAdmin'
+import { AdminProductsPage } from './admin/AdminProductsPage'
+import { AdminOrdersPage } from './admin/AdminOrdersPage'
 import './App.css'
 
 function CatalogRoute() {
@@ -34,6 +38,19 @@ export default function App() {
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          }
+        >
+          <Route index element={<Navigate to="products" replace />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+        </Route>
         <Route path="*" element={<Navigate to="/catalog" replace />} />
       </Routes>
     </div>

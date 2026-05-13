@@ -24,7 +24,12 @@ function normalizeProduct(p) {
     category: String(p?.category ?? ''),
     price: Number(p?.price ?? 0),
     stock: Number(p?.stock ?? 0),
-    imageUrl: p?.image_url == null ? null : String(p.image_url),
+    imageUrl: (() => {
+      const raw = p?.image_url == null ? '' : String(p.image_url).trim()
+      if (!raw) return null
+      if (raw.startsWith('/static')) return `/api${raw}`
+      return raw
+    })(),
     createdAt: p?.created_at ?? null,
   }
 }

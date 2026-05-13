@@ -18,7 +18,6 @@ export function RegisterPage() {
       setError('Пароли не совпадают')
       return
     }
-    // Без backend: после «регистрации» переходим на вход
     navigate('/login', { replace: true })
   }
 

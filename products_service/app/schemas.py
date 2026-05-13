@@ -33,3 +33,19 @@ class ProductOut(ProductBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AdminLogin(BaseModel):
+    username: str = Field(min_length=1, max_length=128)
+    password: str = Field(min_length=1, max_length=256)
+
+
+class AdminToken(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class ImageUploadOut(BaseModel):
+    """Путь для сохранения в image_url (раздаётся через GET /static/...)."""
+
+    path: str

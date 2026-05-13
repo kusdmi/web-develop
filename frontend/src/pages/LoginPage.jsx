@@ -1,17 +1,31 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { useAdminAuth } from '../admin/useAdminAuth'
 import './AuthPage.css'
 
 export function LoginPage() {
-  const navigate = useNavigate()
-  const [login, setLogin] = useState('')
+  const { isAuthenticated, login } = useAdminAuth()
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  if (isAuthenticated) {
+    return <Navigate to="/admin/products" replace />
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!login.trim() || !password.trim()) return
-    // Без backend: имитация успешного входа
-    navigate('/catalog', { replace: true })
+    if (!username.trim() || !password.trim()) return
+    setError('')
+    setLoading(true)
+    try {
+      await login(username.trim(), password)
+    } catch (err) {
+      setError(err?.message || 'Неверный логин или пароль')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -22,16 +36,17 @@ export function LoginPage() {
       <h1 className="auth-page__title">Авторизация</h1>
       <div className="auth-page__card">
         <h2 className="auth-page__card-title">Вход</h2>
+        <p className="auth-page__card-sub">Вход для администраторов магазина</p>
         <form className="auth-page__form" onSubmit={handleSubmit}>
           <label className="auth-page__field">
-            <span className="auth-page__label">Логин или e-mail</span>
+            <span className="auth-page__label">Логин</span>
             <input
               className="auth-page__input"
               type="text"
-              name="login"
+              name="username"
               autoComplete="username"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="Логин"
               required
             />
@@ -49,8 +64,13 @@ export function LoginPage() {
               required
             />
           </label>
-          <button type="submit" className="auth-page__submit">
-            Войти
+          {error ? (
+            <p className="auth-page__error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <button type="submit" className="auth-page__submit" disabled={loading}>
+            {loading ? 'Вход…' : 'Войти'}
           </button>
         </form>
         <p className="auth-page__switch">

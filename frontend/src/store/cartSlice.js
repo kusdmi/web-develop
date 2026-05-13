@@ -4,7 +4,7 @@ import { readStoredCart, writeStoredCart } from './storage'
 export const QTY_MAX = 99
 
 const initialState = {
-  lines: readStoredCart(), // [{ productId, quantity }]
+  lines: readStoredCart(),
 }
 
 const cartSlice = createSlice({

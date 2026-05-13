@@ -4,6 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session, selectinload
 
 from . import crud, models, schemas
+from .auth_admin import get_current_admin
 from .database import Base, engine, get_db
 from .products_client import get_product_price
 
@@ -37,7 +38,10 @@ def create_order(payload: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/orders", response_model=list[schemas.OrderOut])
-def list_orders(db: Session = Depends(get_db)):
+def list_orders(
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+):
     return (
         db.query(models.Order)
         .options(selectinload(models.Order.items))
@@ -47,7 +51,11 @@ def list_orders(db: Session = Depends(get_db)):
 
 
 @app.get("/orders/{order_id}", response_model=schemas.OrderOut)
-def get_order(order_id: int, db: Session = Depends(get_db)):
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+):
     order = (
         db.query(models.Order)
         .options(selectinload(models.Order.items))
@@ -60,7 +68,12 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/orders/{order_id}/status", response_model=schemas.OrderOut)
-def update_status(order_id: int, payload: schemas.OrderStatusUpdate, db: Session = Depends(get_db)):
+def update_status(
+    order_id: int,
+    payload: schemas.OrderStatusUpdate,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+):
     order = (
         db.query(models.Order)
         .options(selectinload(models.Order.items))

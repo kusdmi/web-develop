@@ -30,7 +30,7 @@ export function writeStoredCart(lines) {
     }))
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(payload))
   } catch {
-    // нет места / приватный режим
+    void 0
   }
 }
 

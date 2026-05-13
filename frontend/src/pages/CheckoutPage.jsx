@@ -13,7 +13,6 @@ import {
 } from '../store/ordersSlice'
 import './CheckoutPage.css'
 
-/** Только цифры, длина 8 — показывается на странице и уходит на подтверждение */
 function generateNumericOrderId() {
   let s = ''
   for (let i = 0; i < 8; i += 1) {
@@ -22,7 +21,6 @@ function generateNumericOrderId() {
   return s
 }
 
-/** Нормализация к виду 7 + 10 цифр (без плюса) или null */
 function normalizeRuPhoneDigits(raw) {
   const d = String(raw).replace(/\D/g, '')
   if (d.length === 11) {
@@ -34,10 +32,6 @@ function normalizeRuPhoneDigits(raw) {
   return null
 }
 
-/**
- * Российский номер: после нормализации 11 цифр, код страны 7,
- * первая цифра национального номера — 3, 4, 8 или 9 (гео, моб., 8xx).
- */
 function isValidRuPhone(raw) {
   const n = normalizeRuPhoneDigits(raw)
   if (!n || n.length !== 11 || n[0] !== '7') return false
@@ -86,10 +80,13 @@ export function CheckoutPage() {
       const created = await dispatch(createOrder(payload)).unwrap()
       dispatch(clearCart())
       navigate('/confirmation', {
-        state: { orderId: String(created?.id ?? orderNumber) },
+        state: {
+          orderId: String(created?.id ?? orderNumber),
+          order: created,
+        },
       })
     } catch {
-      // ошибка уже в store
+      void 0
     }
   }
 

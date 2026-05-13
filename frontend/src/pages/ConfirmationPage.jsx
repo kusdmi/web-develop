@@ -1,29 +1,22 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchOrderById,
-  selectLastCreatedOrder,
-  selectOrderById,
-  selectOrderByIdError,
-  selectOrderByIdStatus,
-} from '../store/ordersSlice'
+import { useSelector } from 'react-redux'
+import { selectLastCreatedOrder } from '../store/ordersSlice'
+import { orderStatusLabel } from '../utils/orderStatus'
 import './ConfirmationPage.css'
 
 export function ConfirmationPage() {
-  const dispatch = useDispatch()
   const location = useLocation()
   const last = useSelector(selectLastCreatedOrder)
-  const orderId = location.state?.orderId ?? (last?.id ? String(last.id) : null)
-  const order = useSelector((s) => selectOrderById(s, orderId))
-  const orderStatus = useSelector((s) => selectOrderByIdStatus(s, orderId))
-  const orderError = useSelector((s) => selectOrderByIdError(s, orderId))
+  const stateOrder = location.state?.order ?? null
+  const orderId =
+    location.state?.orderId ?? (last?.id ? String(last.id) : null)
 
-  useEffect(() => {
-    if (!orderId) return
-    if (orderStatus === 'loading' || orderStatus === 'succeeded') return
-    dispatch(fetchOrderById(orderId))
-  }, [dispatch, orderId, orderStatus])
+  const order =
+    stateOrder && String(stateOrder.id) === String(orderId)
+      ? stateOrder
+      : last && String(last.id) === String(orderId)
+        ? last
+        : null
 
   return (
     <div className="confirmation-page">
@@ -48,9 +41,7 @@ export function ConfirmationPage() {
         <p className="confirmation-page__order">
           Номер заказа: <span>{orderId ?? '—'}</span>
         </p>
-        {orderStatus === 'loading' ? <p>Загружаем данные заказа…</p> : null}
-        {orderStatus === 'failed' ? <p>{orderError || 'Не удалось получить заказ'}</p> : null}
-        {order ? <p>Статус: {order.status}</p> : null}
+        {order ? <p>Статус: {orderStatusLabel(order.status)}</p> : null}
         <Link to="/catalog" className="confirmation-page__home">
           Вернуться на главную
         </Link>

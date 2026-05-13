@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useAdminAuth } from '../admin/useAdminAuth'
 import { selectCartTotalItems, selectCartTotalPrice } from '../store/cartSlice'
 import { MEDIA_DESKTOP, useMatchMedia } from '../hooks/useMatchMedia'
 import './ShopHeader.css'
@@ -55,6 +56,7 @@ export function ShopHeader({
 }) {
   const isDesktop = useMatchMedia(MEDIA_DESKTOP)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const { isAuthenticated, adminUsername } = useAdminAuth()
 
   useEffect(() => {
     if (!mobileNavOpen) return
@@ -163,35 +165,72 @@ export function ShopHeader({
     </nav>
   )
 
-  const loginLink = (mobile = false) => (
-    <Link
-      to="/login"
-      className={
-        mobile
-          ? 'shop-header__login shop-header__login--mobile-menu'
-          : 'shop-header__login'
-      }
-      onClick={mobile ? closeMobile : undefined}
-    >
-      <span className="shop-header__login-icon" aria-hidden>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+  const loginOrAccountLink = (mobile = false) => {
+    const base =
+      mobile
+        ? 'shop-header__login shop-header__login--mobile-menu'
+        : 'shop-header__login'
+    const onNav = mobile ? closeMobile : undefined
+
+    if (isAuthenticated) {
+      const label = adminUsername ? `Админ: ${adminUsername}` : 'Администратор'
+      return (
+        <Link
+          to="/admin/products"
+          className={`${base} shop-header__login--admin`.trim()}
+          onClick={onNav}
+          aria-label={label}
         >
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      </span>
-      <span className="shop-header__login-text">Войти</span>
-    </Link>
-  )
+          <span className="shop-header__login-icon" aria-hidden>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <span className="shop-header__login-text-stack">
+            <span className="shop-header__login-status">Вы вошли</span>
+            <span className="shop-header__login-name">{adminUsername || 'Администратор'}</span>
+          </span>
+        </Link>
+      )
+    }
+
+    return (
+      <Link
+        to="/login"
+        className={base}
+        onClick={onNav}
+      >
+        <span className="shop-header__login-icon" aria-hidden>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </span>
+        <span className="shop-header__login-text">Войти</span>
+      </Link>
+    )
+  }
 
   return (
     <header className={`shop-header${compact ? ' shop-header--compact' : ''}`}>
@@ -206,7 +245,7 @@ export function ShopHeader({
           <>
             {navItems(false)}
             <div className="shop-header__trailing">
-              {loginLink(false)}
+              {loginOrAccountLink(false)}
               <CartLink onNavigate={undefined} />
             </div>
           </>
@@ -256,7 +295,7 @@ export function ShopHeader({
           </div>
           {mobileSearchForm}
           {navItems(true)}
-          {loginLink(true)}
+          {loginOrAccountLink(true)}
         </div>
       ) : null}
 
